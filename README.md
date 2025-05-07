@@ -26,4 +26,5 @@ Este proyecto es una aplicación de consola en C++ que permite gestionar un hora
 Compila el código con `g++` u otro compilador C++ compatible:
 
 ```bash
-g++ -std=c++11 -o generador_horarios main.cpp
+g++ generador_horarios.cpp -o generador_horarios
+./generador_horarios.exe

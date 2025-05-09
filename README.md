@@ -57,7 +57,7 @@ git clone https://github.com/Steven735-star/Schedule-Generator-
 cd Schedule-Generator-
 
 # Compile with g++
-g++ -o schedule_generator main.cpp
+g++ -o schedule_generator schedule_generator.cpp
 
 # Run the application
 ./schedule_generator

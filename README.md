@@ -60,7 +60,7 @@ cd Schedule-Generator-
 g++ -o schedule_generator schedule_generator.cpp
 
 # Run the application
-./schedule_generator
+./schedule_generator.exe
 ```
 
 ### Menu Options

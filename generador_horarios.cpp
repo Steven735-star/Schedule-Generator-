@@ -7,460 +7,460 @@
 #include <sstream>
 #include <limits>
 
-// Clase para representar una actividad en el horario
-class Actividad {
+// Class to represent an activity in the schedule
+class Activity {
 private:
-    std::string nombre;
-    int dia;           // 1-7 (Lunes-Domingo)
-    int horaInicio;    // 0-23
-    int minutoInicio;  // 0-59
-    int horaFin;
-    int minutoFin;
-    std::string ubicacion;
+    std::string name;
+    int day;           // 1-7 (Monday-Sunday)
+    int startHour;     // 0-23
+    int startMinute;   // 0-59
+    int endHour;
+    int endMinute;
+    std::string location;
 
 public:
     // Constructor
-    Actividad(std::string n, int d, int hI, int mI, int hF, int mF, std::string u)
-        : nombre(n), dia(d), horaInicio(hI), minutoInicio(mI), 
-          horaFin(hF), minutoFin(mF), ubicacion(u) {}
+    Activity(std::string n, int d, int hI, int mI, int hF, int mF, std::string u)
+        : name(n), day(d), startHour(hI), startMinute(mI), 
+          endHour(hF), endMinute(mF), location(u) {}
 
     // Getters
-    std::string getNombre() const { return nombre; }
-    int getDia() const { return dia; }
-    int getHoraInicio() const { return horaInicio; }
-    int getMinutoInicio() const { return minutoInicio; }
-    int getHoraFin() const { return horaFin; }
-    int getMinutoFin() const { return minutoFin; }
-    std::string getUbicacion() const { return ubicacion; }
+    std::string getName() const { return name; }
+    int getDay() const { return day; }
+    int getStartHour() const { return startHour; }
+    int getStartMinute() const { return startMinute; }
+    int getEndHour() const { return endHour; }
+    int getEndMinute() const { return endMinute; }
+    std::string getLocation() const { return location; }
 
-    // Método para verificar si hay conflicto con otra actividad
-    bool conflictoCon(const Actividad& otra) const {
-        if (dia != otra.dia) return false;
+    // Method to check for conflicts with another activity
+    bool conflictsWith(const Activity& other) const {
+        if (day != other.day) return false;
 
-        // Convertir horas a minutos para facilitar la comparación
-        int inicioA = horaInicio * 60 + minutoInicio;
-        int finA = horaFin * 60 + minutoFin;
-        int inicioB = otra.horaInicio * 60 + otra.minutoInicio;
-        int finB = otra.horaFin * 60 + otra.minutoFin;
+        // Convert hours to minutes for easier comparison
+        int startA = startHour * 60 + startMinute;
+        int endA = endHour * 60 + endMinute;
+        int startB = other.startHour * 60 + other.startMinute;
+        int endB = other.endHour * 60 + other.endMinute;
 
-        // Hay conflicto si el inicio o fin de una actividad está dentro del rango de otra
-        return (inicioA < finB && inicioB < finA);
+        // There's a conflict if the start or end of one activity is within the range of another
+        return (startA < endB && startB < endA);
     }
 
-    // Método para obtener una representación en string de la actividad
+    // Method to get a string representation of the activity
     std::string toString() const {
         std::stringstream ss;
-        ss << nombre << "," << dia << "," << horaInicio << "," << minutoInicio << ","
-           << horaFin << "," << minutoFin << "," << ubicacion;
+        ss << name << "," << day << "," << startHour << "," << startMinute << ","
+           << endHour << "," << endMinute << "," << location;
         return ss.str();
     }
 
-    // Método para mostrar la actividad de forma legible
-    void mostrar() const {
-        static const std::string diasSemana[] = {"", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"};
-        std::cout << "- " << nombre << " (" << diasSemana[dia] << " " 
-                  << std::setfill('0') << std::setw(2) << horaInicio << ":" 
-                  << std::setw(2) << minutoInicio << " - "
-                  << std::setw(2) << horaFin << ":" 
-                  << std::setw(2) << minutoFin << ") en " << ubicacion << std::endl;
+    // Method to display the activity in a readable format
+    void display() const {
+        static const std::string weekDays[] = {"", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        std::cout << "- " << name << " (" << weekDays[day] << " " 
+                  << std::setfill('0') << std::setw(2) << startHour << ":" 
+                  << std::setw(2) << startMinute << " - "
+                  << std::setw(2) << endHour << ":" 
+                  << std::setw(2) << endMinute << ") at " << location << std::endl;
     }
 };
 
-// Clase para gestionar el horario completo
-class Horario {
+// Class to manage the complete schedule
+class Schedule {
 private:
-    std::vector<Actividad> actividades;
-    std::string nombre;
+    std::vector<Activity> activities;
+    std::string name;
 
 public:
     // Constructor
-    Horario(std::string n = "Mi Horario") : nombre(n) {}
+    Schedule(std::string n = "My Schedule") : name(n) {}
 
-    // Método para añadir una actividad
-    bool agregarActividad(const Actividad& nuevaActividad) {
-        // Verificar si hay conflictos
-        for (const auto& actividad : actividades) {
-            if (actividad.conflictoCon(nuevaActividad)) {
-                std::cout << "Error: Conflicto de horario detectado." << std::endl;
-                std::cout << "La nueva actividad: ";
-                nuevaActividad.mostrar();
-                std::cout << "Conflicta con: ";
-                actividad.mostrar();
+    // Method to add an activity
+    bool addActivity(const Activity& newActivity) {
+        // Check for conflicts
+        for (const auto& activity : activities) {
+            if (activity.conflictsWith(newActivity)) {
+                std::cout << "Error: Schedule conflict detected." << std::endl;
+                std::cout << "The new activity: ";
+                newActivity.display();
+                std::cout << "Conflicts with: ";
+                activity.display();
                 return false;
             }
         }
 
-        // Si no hay conflictos, añadir la actividad
-        actividades.push_back(nuevaActividad);
+        // If no conflicts, add the activity
+        activities.push_back(newActivity);
         return true;
     }
 
-    // Método para mostrar todo el horario
-    void mostrarHorario() const {
-        if (actividades.empty()) {
-            std::cout << "El horario está vacío." << std::endl;
+    // Method to display the entire schedule
+    void displaySchedule() const {
+        if (activities.empty()) {
+            std::cout << "The schedule is empty." << std::endl;
             return;
         }
 
-        std::cout << "\n=== " << nombre << " ===" << std::endl;
+        std::cout << "\n=== " << name << " ===" << std::endl;
         
-        for (int dia = 1; dia <= 7; dia++) {
-            static const std::string diasSemana[] = {"", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"};
-            std::cout << "\n" << diasSemana[dia] << ":" << std::endl;
+        for (int day = 1; day <= 7; day++) {
+            static const std::string weekDays[] = {"", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+            std::cout << "\n" << weekDays[day] << ":" << std::endl;
             
-            bool hayActividades = false;
-            std::vector<Actividad> actividadesDia;
+            bool hasActivities = false;
+            std::vector<Activity> dayActivities;
             
-            for (const auto& actividad : actividades) {
-                if (actividad.getDia() == dia) {
-                    actividadesDia.push_back(actividad);
-                    hayActividades = true;
+            for (const auto& activity : activities) {
+                if (activity.getDay() == day) {
+                    dayActivities.push_back(activity);
+                    hasActivities = true;
                 }
             }
             
-            if (!hayActividades) {
-                std::cout << "  No hay actividades." << std::endl;
+            if (!hasActivities) {
+                std::cout << "  No activities." << std::endl;
             } else {
-                // Ordenar por hora de inicio
-                std::sort(actividadesDia.begin(), actividadesDia.end(), 
-                    [](const Actividad& a, const Actividad& b) {
-                        int inicioA = a.getHoraInicio() * 60 + a.getMinutoInicio();
-                        int inicioB = b.getHoraInicio() * 60 + b.getMinutoInicio();
-                        return inicioA < inicioB;
+                // Sort by start time
+                std::sort(dayActivities.begin(), dayActivities.end(), 
+                    [](const Activity& a, const Activity& b) {
+                        int startA = a.getStartHour() * 60 + a.getStartMinute();
+                        int startB = b.getStartHour() * 60 + b.getStartMinute();
+                        return startA < startB;
                     });
                 
-                for (const auto& actividad : actividadesDia) {
+                for (const auto& activity : dayActivities) {
                     std::cout << "  ";
-                    actividad.mostrar();
+                    activity.display();
                 }
             }
         }
     }
 
-    // Método para eliminar una actividad por nombre
-    bool eliminarActividad(const std::string& nombre) {
-        auto it = std::find_if(actividades.begin(), actividades.end(),
-                              [&nombre](const Actividad& a) { return a.getNombre() == nombre; });
+    // Method to remove an activity by name
+    bool removeActivity(const std::string& activityName) {
+        auto it = std::find_if(activities.begin(), activities.end(),
+                              [&activityName](const Activity& a) { return a.getName() == activityName; });
         
-        if (it != actividades.end()) {
-            actividades.erase(it);
-            std::cout << "Actividad '" << nombre << "' eliminada correctamente." << std::endl;
+        if (it != activities.end()) {
+            activities.erase(it);
+            std::cout << "Activity '" << activityName << "' successfully removed." << std::endl;
             return true;
         }
         
-        std::cout << "No se encontró ninguna actividad con el nombre '" << nombre << "'." << std::endl;
+        std::cout << "No activity found with the name '" << activityName << "'." << std::endl;
         return false;
     }
 
-    // Método para mostrar actividades de un día específico
-    void mostrarDia(int dia) const {
-        static const std::string diasSemana[] = {"", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"};
+    // Method to display activities for a specific day
+    void displayDay(int day) const {
+        static const std::string weekDays[] = {"", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         
-        if (dia < 1 || dia > 7) {
-            std::cout << "Día inválido. Debe ser un número entre 1 (Lunes) y 7 (Domingo)." << std::endl;
+        if (day < 1 || day > 7) {
+            std::cout << "Invalid day. Must be a number between 1 (Monday) and 7 (Sunday)." << std::endl;
             return;
         }
         
-        std::cout << "\nActividades para el " << diasSemana[dia] << ":" << std::endl;
+        std::cout << "\nActivities for " << weekDays[day] << ":" << std::endl;
         
-        bool hayActividades = false;
-        std::vector<Actividad> actividadesDia;
+        bool hasActivities = false;
+        std::vector<Activity> dayActivities;
         
-        for (const auto& actividad : actividades) {
-            if (actividad.getDia() == dia) {
-                actividadesDia.push_back(actividad);
-                hayActividades = true;
+        for (const auto& activity : activities) {
+            if (activity.getDay() == day) {
+                dayActivities.push_back(activity);
+                hasActivities = true;
             }
         }
         
-        if (!hayActividades) {
-            std::cout << "  No hay actividades para este día." << std::endl;
+        if (!hasActivities) {
+            std::cout << "  No activities for this day." << std::endl;
             return;
         }
         
-        // Ordenar por hora de inicio
-        std::sort(actividadesDia.begin(), actividadesDia.end(), 
-            [](const Actividad& a, const Actividad& b) {
-                int inicioA = a.getHoraInicio() * 60 + a.getMinutoInicio();
-                int inicioB = b.getHoraInicio() * 60 + b.getMinutoInicio();
-                return inicioA < inicioB;
+        // Sort by start time
+        std::sort(dayActivities.begin(), dayActivities.end(), 
+            [](const Activity& a, const Activity& b) {
+                int startA = a.getStartHour() * 60 + a.getStartMinute();
+                int startB = b.getStartHour() * 60 + b.getStartMinute();
+                return startA < startB;
             });
         
-        for (const auto& actividad : actividadesDia) {
+        for (const auto& activity : dayActivities) {
             std::cout << "  ";
-            actividad.mostrar();
+            activity.display();
         }
     }
 
-    // Método para guardar el horario en un archivo
-    bool guardarEnArchivo(const std::string& nombreArchivo) const {
-        std::ofstream archivo(nombreArchivo);
+    // Method to save the schedule to a file
+    bool saveToFile(const std::string& filename) const {
+        std::ofstream file(filename);
         
-        if (!archivo.is_open()) {
-            std::cout << "Error: No se pudo abrir el archivo para escritura." << std::endl;
+        if (!file.is_open()) {
+            std::cout << "Error: Could not open file for writing." << std::endl;
             return false;
         }
         
-        archivo << nombre << std::endl;
+        file << name << std::endl;
         
-        for (const auto& actividad : actividades) {
-            archivo << actividad.toString() << std::endl;
+        for (const auto& activity : activities) {
+            file << activity.toString() << std::endl;
         }
         
-        archivo.close();
-        std::cout << "Horario guardado correctamente en '" << nombreArchivo << "'." << std::endl;
+        file.close();
+        std::cout << "Schedule successfully saved to '" << filename << "'." << std::endl;
         return true;
     }
 
-    // Método para cargar el horario desde un archivo
-    bool cargarDesdeArchivo(const std::string& nombreArchivo) {
-        std::ifstream archivo(nombreArchivo);
+    // Method to load the schedule from a file
+    bool loadFromFile(const std::string& filename) {
+        std::ifstream file(filename);
         
-        if (!archivo.is_open()) {
-            std::cout << "Error: No se pudo abrir el archivo para lectura." << std::endl;
+        if (!file.is_open()) {
+            std::cout << "Error: Could not open file for reading." << std::endl;
             return false;
         }
         
-        actividades.clear();  // Limpiar las actividades actuales
+        activities.clear();  // Clear current activities
         
-        // Leer el nombre del horario
-        std::getline(archivo, nombre);
+        // Read the schedule name
+        std::getline(file, name);
         
-        std::string linea;
-        while (std::getline(archivo, linea)) {
-            std::stringstream ss(linea);
-            std::string nombre, ubicacion, valor;
-            int dia, horaInicio, minutoInicio, horaFin, minutoFin;
+        std::string line;
+        while (std::getline(file, line)) {
+            std::stringstream ss(line);
+            std::string activityName, location, value;
+            int day, startHour, startMinute, endHour, endMinute;
             
-            // Leer los campos separados por comas
-            std::getline(ss, nombre, ',');
-            std::getline(ss, valor, ','); dia = std::stoi(valor);
-            std::getline(ss, valor, ','); horaInicio = std::stoi(valor);
-            std::getline(ss, valor, ','); minutoInicio = std::stoi(valor);
-            std::getline(ss, valor, ','); horaFin = std::stoi(valor);
-            std::getline(ss, valor, ','); minutoFin = std::stoi(valor);
-            std::getline(ss, ubicacion);
+            // Read comma-separated fields
+            std::getline(ss, activityName, ',');
+            std::getline(ss, value, ','); day = std::stoi(value);
+            std::getline(ss, value, ','); startHour = std::stoi(value);
+            std::getline(ss, value, ','); startMinute = std::stoi(value);
+            std::getline(ss, value, ','); endHour = std::stoi(value);
+            std::getline(ss, value, ','); endMinute = std::stoi(value);
+            std::getline(ss, location);
             
-            Actividad actividad(nombre, dia, horaInicio, minutoInicio, horaFin, minutoFin, ubicacion);
-            actividades.push_back(actividad);
+            Activity activity(activityName, day, startHour, startMinute, endHour, endMinute, location);
+            activities.push_back(activity);
         }
         
-        archivo.close();
-        std::cout << "Horario cargado correctamente desde '" << nombreArchivo << "'." << std::endl;
+        file.close();
+        std::cout << "Schedule successfully loaded from '" << filename << "'." << std::endl;
         return true;
     }
 
-    // Método para cambiar el nombre del horario
-    void cambiarNombre(const std::string& nuevoNombre) {
-        nombre = nuevoNombre;
-        std::cout << "Nombre del horario cambiado a: " << nombre << std::endl;
+    // Method to change the schedule name
+    void changeName(const std::string& newName) {
+        name = newName;
+        std::cout << "Schedule name changed to: " << name << std::endl;
     }
 
-    // Método para buscar huecos libres en un día específico
-    void buscarHuecosLibres(int dia) const {
-        static const std::string diasSemana[] = {"", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"};
+    // Method to find free time slots in a specific day
+    void findFreeSlots(int day) const {
+        static const std::string weekDays[] = {"", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         
-        if (dia < 1 || dia > 7) {
-            std::cout << "Día inválido. Debe ser un número entre 1 (Lunes) y 7 (Domingo)." << std::endl;
+        if (day < 1 || day > 7) {
+            std::cout << "Invalid day. Must be a number between 1 (Monday) and 7 (Sunday)." << std::endl;
             return;
         }
         
-        std::vector<Actividad> actividadesDia;
-        for (const auto& actividad : actividades) {
-            if (actividad.getDia() == dia) {
-                actividadesDia.push_back(actividad);
+        std::vector<Activity> dayActivities;
+        for (const auto& activity : activities) {
+            if (activity.getDay() == day) {
+                dayActivities.push_back(activity);
             }
         }
         
-        // Ordenar por hora de inicio
-        std::sort(actividadesDia.begin(), actividadesDia.end(), 
-            [](const Actividad& a, const Actividad& b) {
-                int inicioA = a.getHoraInicio() * 60 + a.getMinutoInicio();
-                int inicioB = b.getHoraInicio() * 60 + b.getMinutoInicio();
-                return inicioA < inicioB;
+        // Sort by start time
+        std::sort(dayActivities.begin(), dayActivities.end(), 
+            [](const Activity& a, const Activity& b) {
+                int startA = a.getStartHour() * 60 + a.getStartMinute();
+                int startB = b.getStartHour() * 60 + b.getStartMinute();
+                return startA < startB;
             });
         
-        std::cout << "\nHuecos libres para el " << diasSemana[dia] << ":" << std::endl;
+        std::cout << "\nFree time slots for " << weekDays[day] << ":" << std::endl;
         
-        if (actividadesDia.empty()) {
-            std::cout << "  Todo el día está libre." << std::endl;
+        if (dayActivities.empty()) {
+            std::cout << "  The entire day is free." << std::endl;
             return;
         }
         
-        // Horario típico diurno (8:00 - 22:00)
-        int inicioJornada = 8 * 60;  // 8:00 AM
-        int finJornada = 22 * 60;    // 10:00 PM
+        // Typical daytime schedule (8:00 - 22:00)
+        int dayStart = 8 * 60;  // 8:00 AM
+        int dayEnd = 22 * 60;    // 10:00 PM
         
-        // Hueco al inicio del día
-        if (actividadesDia[0].getHoraInicio() * 60 + actividadesDia[0].getMinutoInicio() > inicioJornada) {
-            std::cout << "  " << formatoHora(inicioJornada) << " - " 
-                      << formatoHora(actividadesDia[0].getHoraInicio() * 60 + actividadesDia[0].getMinutoInicio()) 
+        // Free slot at the beginning of the day
+        if (dayActivities[0].getStartHour() * 60 + dayActivities[0].getStartMinute() > dayStart) {
+            std::cout << "  " << formatTime(dayStart) << " - " 
+                      << formatTime(dayActivities[0].getStartHour() * 60 + dayActivities[0].getStartMinute()) 
                       << std::endl;
         }
         
-        // Huecos entre actividades
-        for (size_t i = 0; i < actividadesDia.size() - 1; i++) {
-            int finActual = actividadesDia[i].getHoraFin() * 60 + actividadesDia[i].getMinutoFin();
-            int inicioSiguiente = actividadesDia[i+1].getHoraInicio() * 60 + actividadesDia[i+1].getMinutoInicio();
+        // Free slots between activities
+        for (size_t i = 0; i < dayActivities.size() - 1; i++) {
+            int currentEnd = dayActivities[i].getEndHour() * 60 + dayActivities[i].getEndMinute();
+            int nextStart = dayActivities[i+1].getStartHour() * 60 + dayActivities[i+1].getStartMinute();
             
-            if (inicioSiguiente > finActual) {
-                std::cout << "  " << formatoHora(finActual) << " - " << formatoHora(inicioSiguiente) << std::endl;
+            if (nextStart > currentEnd) {
+                std::cout << "  " << formatTime(currentEnd) << " - " << formatTime(nextStart) << std::endl;
             }
         }
         
-        // Hueco al final del día
-        int finUltima = actividadesDia.back().getHoraFin() * 60 + actividadesDia.back().getMinutoFin();
-        if (finUltima < finJornada) {
-            std::cout << "  " << formatoHora(finUltima) << " - " << formatoHora(finJornada) << std::endl;
+        // Free slot at the end of the day
+        int lastEnd = dayActivities.back().getEndHour() * 60 + dayActivities.back().getEndMinute();
+        if (lastEnd < dayEnd) {
+            std::cout << "  " << formatTime(lastEnd) << " - " << formatTime(dayEnd) << std::endl;
         }
     }
 
 private:
-    // Método auxiliar para formatear la hora (convertir minutos a formato HH:MM)
-    static std::string formatoHora(int minutos) {
-        int horas = minutos / 60;
-        int mins = minutos % 60;
+    // Helper method to format time (convert minutes to HH:MM format)
+    static std::string formatTime(int minutes) {
+        int hours = minutes / 60;
+        int mins = minutes % 60;
         std::stringstream ss;
-        ss << std::setfill('0') << std::setw(2) << horas << ":" 
+        ss << std::setfill('0') << std::setw(2) << hours << ":" 
            << std::setfill('0') << std::setw(2) << mins;
         return ss.str();
     }
 };
 
-// Función principal que implementa el menú interactivo
+// Main function implementing the interactive menu
 int main() {
-    Horario miHorario;
-    std::string nombreArchivo = "horario.txt";
+    Schedule mySchedule;
+    std::string filename = "schedule.txt";
     
-    // Intentar cargar el horario desde el archivo al inicio
-    std::ifstream testFile(nombreArchivo);
+    // Try to load the schedule from file at startup
+    std::ifstream testFile(filename);
     if (testFile.good()) {
         testFile.close();
-        miHorario.cargarDesdeArchivo(nombreArchivo);
+        mySchedule.loadFromFile(filename);
     }
     
-    int opcion;
+    int option;
     do {
-        std::cout << "\n=== GENERADOR DE HORARIOS ===" << std::endl;
-        std::cout << "1. Agregar actividad" << std::endl;
-        std::cout << "2. Eliminar actividad" << std::endl;
-        std::cout << "3. Mostrar horario completo" << std::endl;
-        std::cout << "4. Mostrar actividades de un día" << std::endl;
-        std::cout << "5. Buscar huecos libres en un día" << std::endl;
-        std::cout << "6. Guardar horario" << std::endl;
-        std::cout << "7. Cargar horario" << std::endl;
-        std::cout << "8. Cambiar nombre del horario" << std::endl;
-        std::cout << "0. Salir" << std::endl;
-        std::cout << "Seleccione una opción: ";
-        std::cin >> opcion;
+        std::cout << "\n=== SCHEDULE GENERATOR ===" << std::endl;
+        std::cout << "1. Add activity" << std::endl;
+        std::cout << "2. Remove activity" << std::endl;
+        std::cout << "3. Display complete schedule" << std::endl;
+        std::cout << "4. Display activities for a day" << std::endl;
+        std::cout << "5. Find free time slots in a day" << std::endl;
+        std::cout << "6. Save schedule" << std::endl;
+        std::cout << "7. Load schedule" << std::endl;
+        std::cout << "8. Change schedule name" << std::endl;
+        std::cout << "0. Exit" << std::endl;
+        std::cout << "Select an option: ";
+        std::cin >> option;
         
-        // Limpiar el buffer de entrada
+        // Clear input buffer
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         
-        switch (opcion) {
+        switch (option) {
             case 1: {
-                std::string nombre, ubicacion;
-                int dia, horaInicio, minutoInicio, horaFin, minutoFin;
+                std::string name, location;
+                int day, startHour, startMinute, endHour, endMinute;
                 
-                std::cout << "Nombre de la actividad: ";
-                std::getline(std::cin, nombre);
+                std::cout << "Activity name: ";
+                std::getline(std::cin, name);
                 
-                std::cout << "Día de la semana (1=Lunes, 2=Martes, ..., 7=Domingo): ";
-                std::cin >> dia;
+                std::cout << "Day of week (1=Monday, 2=Tuesday, ..., 7=Sunday): ";
+                std::cin >> day;
                 
-                std::cout << "Hora de inicio (0-23): ";
-                std::cin >> horaInicio;
+                std::cout << "Start hour (0-23): ";
+                std::cin >> startHour;
                 
-                std::cout << "Minuto de inicio (0-59): ";
-                std::cin >> minutoInicio;
+                std::cout << "Start minute (0-59): ";
+                std::cin >> startMinute;
                 
-                std::cout << "Hora de fin (0-23): ";
-                std::cin >> horaFin;
+                std::cout << "End hour (0-23): ";
+                std::cin >> endHour;
                 
-                std::cout << "Minuto de fin (0-59): ";
-                std::cin >> minutoFin;
+                std::cout << "End minute (0-59): ";
+                std::cin >> endMinute;
                 
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 
-                std::cout << "Ubicación: ";
-                std::getline(std::cin, ubicacion);
+                std::cout << "Location: ";
+                std::getline(std::cin, location);
                 
-                if (dia < 1 || dia > 7 || horaInicio < 0 || horaInicio > 23 || 
-                    minutoInicio < 0 || minutoInicio > 59 || horaFin < 0 || horaFin > 23 || 
-                    minutoFin < 0 || minutoFin > 59) {
-                    std::cout << "Error: Valores fuera de rango." << std::endl;
+                if (day < 1 || day > 7 || startHour < 0 || startHour > 23 || 
+                    startMinute < 0 || startMinute > 59 || endHour < 0 || endHour > 23 || 
+                    endMinute < 0 || endMinute > 59) {
+                    std::cout << "Error: Values out of range." << std::endl;
                     break;
                 }
                 
-                if (horaInicio > horaFin || (horaInicio == horaFin && minutoInicio >= minutoFin)) {
-                    std::cout << "Error: La hora de fin debe ser posterior a la hora de inicio." << std::endl;
+                if (startHour > endHour || (startHour == endHour && startMinute >= endMinute)) {
+                    std::cout << "Error: End time must be after start time." << std::endl;
                     break;
                 }
                 
-                Actividad nuevaActividad(nombre, dia, horaInicio, minutoInicio, horaFin, minutoFin, ubicacion);
-                miHorario.agregarActividad(nuevaActividad);
+                Activity newActivity(name, day, startHour, startMinute, endHour, endMinute, location);
+                mySchedule.addActivity(newActivity);
                 break;
             }
             case 2: {
-                std::string nombre;
-                std::cout << "Nombre de la actividad a eliminar: ";
-                std::getline(std::cin, nombre);
-                miHorario.eliminarActividad(nombre);
+                std::string name;
+                std::cout << "Name of activity to remove: ";
+                std::getline(std::cin, name);
+                mySchedule.removeActivity(name);
                 break;
             }
             case 3: {
-                miHorario.mostrarHorario();
+                mySchedule.displaySchedule();
                 break;
             }
             case 4: {
-                int dia;
-                std::cout << "Día de la semana (1=Lunes, 2=Martes, ..., 7=Domingo): ";
-                std::cin >> dia;
-                miHorario.mostrarDia(dia);
+                int day;
+                std::cout << "Day of week (1=Monday, 2=Tuesday, ..., 7=Sunday): ";
+                std::cin >> day;
+                mySchedule.displayDay(day);
                 break;
             }
             case 5: {
-                int dia;
-                std::cout << "Día de la semana (1=Lunes, 2=Martes, ..., 7=Domingo): ";
-                std::cin >> dia;
-                miHorario.buscarHuecosLibres(dia);
+                int day;
+                std::cout << "Day of week (1=Monday, 2=Tuesday, ..., 7=Sunday): ";
+                std::cin >> day;
+                mySchedule.findFreeSlots(day);
                 break;
             }
             case 6: {
-                std::string archivo;
-                std::cout << "Nombre del archivo (deje en blanco para usar '" << nombreArchivo << "'): ";
-                std::getline(std::cin, archivo);
-                if (archivo.empty()) {
-                    archivo = nombreArchivo;
+                std::string file;
+                std::cout << "Filename (leave blank to use '" << filename << "'): ";
+                std::getline(std::cin, file);
+                if (file.empty()) {
+                    file = filename;
                 }
-                miHorario.guardarEnArchivo(archivo);
+                mySchedule.saveToFile(file);
                 break;
             }
             case 7: {
-                std::string archivo;
-                std::cout << "Nombre del archivo (deje en blanco para usar '" << nombreArchivo << "'): ";
-                std::getline(std::cin, archivo);
-                if (archivo.empty()) {
-                    archivo = nombreArchivo;
+                std::string file;
+                std::cout << "Filename (leave blank to use '" << filename << "'): ";
+                std::getline(std::cin, file);
+                if (file.empty()) {
+                    file = filename;
                 }
-                miHorario.cargarDesdeArchivo(archivo);
+                mySchedule.loadFromFile(file);
                 break;
             }
             case 8: {
-                std::string nombre;
-                std::cout << "Nuevo nombre para el horario: ";
-                std::getline(std::cin, nombre);
-                miHorario.cambiarNombre(nombre);
+                std::string name;
+                std::cout << "New name for the schedule: ";
+                std::getline(std::cin, name);
+                mySchedule.changeName(name);
                 break;
             }
             case 0:
-                std::cout << "¡Hasta pronto!" << std::endl;
+                std::cout << "Goodbye!" << std::endl;
                 break;
             default:
-                std::cout << "Opción no válida. Intente de nuevo." << std::endl;
+                std::cout << "Invalid option. Please try again." << std::endl;
         }
         
-    } while (opcion != 0);
+    } while (option != 0);
     
     return 0;
 }
